@@ -34,15 +34,25 @@
 			}));
 	}
 
-	let name = $state(course?.name || '');
-	let credits = $state(course?.credits || 3);
-	let color = $state(course?.color || '#6366f1');
-	let section = $state(course?.section || '');
-	let cycle = $state(course?.cycle || '2026-I');
-	let blocks = $state<ScheduleBlock[]>(
-		course?.blocks || [{ day: 'monday' as Day, startSlot: 0, endSlot: 1 }]
-	);
+	let name = $state('');
+	let credits = $state(3);
+	let color = $state('#6366f1');
+	let section = $state('');
+	let cycle = $state('2026-I');
+	let blocks = $state<ScheduleBlock[]>([{ day: 'monday' as Day, startSlot: 0, endSlot: 1 }]);
 	let error = $state('');
+
+	$effect(() => {
+		const c = course;
+		if (c) {
+			name = c.name;
+			credits = c.credits;
+			color = c.color;
+			section = c.section;
+			cycle = c.cycle;
+			blocks = [...c.blocks];
+		}
+	});
 
 	function addBlock() {
 		blocks = [...blocks, { day: 'monday' as Day, startSlot: 0, endSlot: 1 }];
