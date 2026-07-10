@@ -2,13 +2,29 @@
 	import { onMount } from 'svelte';
 	import { scheduleStore } from '$lib/stores/schedule.svelte';
 	import ScheduleGrid from '$lib/components/ScheduleGrid.svelte';
+	import Select from '$lib/components/Select.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Printer from '@lucide/svelte/icons/printer';
 	import Calendar from '@lucide/svelte/icons/calendar';
 
+	const sectionOptions = [
+		{ value: '__all__', label: 'Todas las secciones' },
+		...['A', 'B', 'C', 'D', 'E', 'F'].map((s) => ({ value: s, label: `Seccion ${s}` }))
+	];
+
+	let selectedSection = $state('__all__');
+
 	onMount(() => {
 		scheduleStore.init();
 	});
+
+	const filteredCourses = $derived(
+		selectedSection === '__all__'
+			? scheduleStore.courses
+			: scheduleStore.courses.filter((c) => c.section === selectedSection)
+	);
+
+	const filteredCredits = $derived(filteredCourses.reduce((sum, c) => sum + c.credits, 0));
 
 	function handleDelete(id: string) {
 		scheduleStore.deleteCourse(id);
@@ -50,10 +66,13 @@
 	<div>
 		<h2 class="text-xl font-bold text-foreground">Horario Semanal</h2>
 		<p class="text-sm text-muted">
-			{scheduleStore.courses.length} cursos · {scheduleStore.totalCredits} creditos
+			{filteredCourses.length} cursos · {filteredCredits} creditos
 		</p>
 	</div>
-	<div class="flex gap-2">
+	<div class="flex items-center gap-2">
+		<div class="w-[200px]">
+			<Select bind:value={selectedSection} options={sectionOptions} placeholder="Seccion" />
+		</div>
 		<a href="/cursos/nuevo" class="button button--primary flex items-center gap-1.5">
 			<Plus size={16} />
 			Nuevo Curso
@@ -82,8 +101,16 @@
 			Agregar Curso
 		</a>
 	</div>
+{:else if filteredCourses.length === 0}
+	<div class="card card--secondary mt-6 flex flex-col items-center gap-4 py-12 text-center">
+		<Calendar size={48} class="text-muted opacity-30" />
+		<div>
+			<h3 class="text-lg font-medium text-foreground">Sin cursos para esta seccion</h3>
+			<p class="mt-1 text-sm text-muted">No hay cursos asignados a la seccion seleccionada</p>
+		</div>
+	</div>
 {:else}
 	<div class="card card--default mt-6 overflow-hidden p-0">
-		<ScheduleGrid courses={scheduleStore.courses} onDelete={handleDelete} />
+		<ScheduleGrid courses={filteredCourses} onDelete={handleDelete} />
 	</div>
 {/if}

@@ -23,6 +23,10 @@
 
 	const timeSlots = generateTimeSlots();
 
+	const sectionOptions = ['A', 'B', 'C', 'D', 'E', 'F'].map((s) => ({
+		value: s,
+		label: `Seccion ${s}`
+	}));
 	const dayOptions = DAYS.map((d) => ({ value: d, label: DAY_LABELS[d] }));
 	const startSlotOptions = timeSlots.map((s) => ({ value: String(s.index), label: s.label }));
 	function endSlotOptions(startSlot: number) {
@@ -133,7 +137,7 @@
 			<input
 				id="course-name"
 				type="text"
-				class="input"
+				class="input input--secondary"
 				placeholder="Ej: Calculo I"
 				bind:value={name}
 				required
@@ -146,7 +150,7 @@
 				<input
 					id="course-credits"
 					type="number"
-					class="input"
+					class="input input--secondary"
 					min="1"
 					max="10"
 					bind:value={credits}
@@ -154,13 +158,12 @@
 				/>
 			</div>
 			<div class="flex flex-col gap-1">
-				<label for="course-section" class="label">Seccion</label>
-				<input
-					id="course-section"
-					type="text"
-					class="input"
-					placeholder="Ej: A1"
-					bind:value={section}
+				<label class="label">Seccion</label>
+				<Select
+					value={section}
+					options={sectionOptions}
+					placeholder="Seleccionar seccion"
+					onChange={(v) => (section = v)}
 				/>
 			</div>
 		</div>
@@ -171,7 +174,7 @@
 				<input
 					id="course-cycle"
 					type="text"
-					class="input"
+					class="input input--secondary"
 					placeholder="Ej: 2026-I"
 					bind:value={cycle}
 				/>
@@ -182,7 +185,7 @@
 					<input
 						id="course-color"
 						type="color"
-						class="h-10 w-14 cursor-pointer rounded-field border-0"
+						class="h-10 w-14 cursor-pointer rounded-field border-0 input--secondary"
 						bind:value={color}
 					/>
 					<span class="text-xs text-muted">{color}</span>
